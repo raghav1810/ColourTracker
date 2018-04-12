@@ -11,7 +11,7 @@ def color_isolate(hsv, lower, upper) :
 	kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
 	opening = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
 	median_2 = cv2.medianBlur(opening,15)
-	# cv2.imshow('Median Blur', median_2)
+
 
 	return median_2
 
@@ -45,7 +45,7 @@ while(True):
 	img = cv2.flip(frame, 1)
 	hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-	
+
 	a_pos = cv2.getTrackbarPos('RGB', 'img')
 	text = colour_dict[a_pos]
 
