@@ -85,14 +85,14 @@ while(True):
 
 	cv2.imshow("img", img)
 
-	# Press q to close
-	key = cv2.waitKey(1)
-	if key == 113:
-		break
 	# Save image if spacebar pressed
-	# elif key == 32:
-	# 	cv2.imwrite("colourTrack%d.png"%i,img)
-	# 	i += 1
+	# Press Q to close the window
+	key = cv2.waitKey(1)
+	if key == 113: 
+		break
+	elif key == 32:
+		cv2.imwrite("colourTrack%d.png"%i,img)
+		i += 1
 
 cap.release()
 cv2.destroyAllWindows()
