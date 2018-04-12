@@ -1,12 +1,13 @@
 import cv2
 import numpy as np
 
+
+# Processing image based on upper and lower bounds passed to function
 def color_isolate(hsv, lower, upper) :
 	mask = cv2.inRange(hsv,lower,upper)
 	res = cv2.bitwise_and(img,img, mask= mask)
 
 	median = cv2.medianBlur(mask,15)
-	# cv2.imshow('Median Blur',mask)
 
 	kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
 	opening = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
@@ -15,6 +16,8 @@ def color_isolate(hsv, lower, upper) :
 
 	return median_2
 
+
+# Defines range of colour to track based on value passed by trackbar 
 def choose_colour(x):
 	if x == 0:
 		lower = np.array([0,80,40])
@@ -31,13 +34,16 @@ def choose_colour(x):
 	return lower, upper, text_colour
 
 
+
+
 cap = cv2.VideoCapture(0)
 
+
+# Use trackbar to switch between tracking a red, blue or green object
 cv2.namedWindow('img')
 cv2.createTrackbar('RGB', 'img', 0, 2, choose_colour)
 
-i = 0
-
+# i = 0
 colour_dict = {0:"Red", 1:"Green", 2:"Blue"}
 
 while(True):
@@ -46,19 +52,23 @@ while(True):
 	hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
 
+	# Obtain position of trackbar to pick which colour to track
 	a_pos = cv2.getTrackbarPos('RGB', 'img')
 	text = colour_dict[a_pos]
 
 
+	# Use position of trackbar to pick colour and then isolate objects of matching colour
 	lower, upper, text_colour = choose_colour(a_pos)
 	fnres = color_isolate(hsv, lower, upper)
 
 
+	# Extract contours from image after processing
 	_,contours,_ = cv2.findContours(fnres, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 	try:
+		# Obtain contour of greatest size
 		c = max(contours, key = cv2.contourArea)
-		# cv2.drawContours(img, c, -1, (50,255,50), 5)
 		area = cv2.contourArea(c)
+		# Use contour only if area greater than 150 to avoid noise
 		if area >= 150:
 				rect = cv2.minAreaRect(c)
 				box = cv2.boxPoints(rect)
@@ -67,6 +77,7 @@ while(True):
 		
 		pass
 	except Exception:
+		# Display message if no object found in image
 		cv2.putText(img,"No contours in frame",(10,60),cv2.FONT_HERSHEY_SIMPLEX,0.9,(0,0,0),1,cv2.LINE_AA)
 	
 
@@ -74,11 +85,14 @@ while(True):
 
 	cv2.imshow("img", img)
 
+	# Press q to close
 	key = cv2.waitKey(1)
 	if key == 113:
 		break
-	elif key == 32:
-		cv2.imwrite("colourTrack%d.png"%i,img)
-		i += 1
+	# Save image if spacebar pressed
+	# elif key == 32:
+	# 	cv2.imwrite("colourTrack%d.png"%i,img)
+	# 	i += 1
+
 cap.release()
 cv2.destroyAllWindows()
